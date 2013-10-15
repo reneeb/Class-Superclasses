@@ -2,9 +2,10 @@ package Class::Superclasses;
 
 use strict;
 use warnings;
+use List::Util qw(first);
 use PPI;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 sub new{
     my ($class,$doc) = @_,
@@ -35,6 +36,7 @@ sub _find_super{
     
     my $varref = $ppi->find('PPI::Statement::Variable');
     my @vars   = ();
+
     if($varref){
         @vars    = $self->_get_isa_values($varref);
     }
@@ -42,17 +44,51 @@ sub _find_super{
     my $baseref  = $ppi->find('PPI::Statement::Include');
     my @base     = ();
     my @includes = qw(base parent);
+
     if($baseref){
         @base = $self->_get_include_values([grep{my $i = $_->module; grep{ $_ eq $i }@includes }@$baseref]);
     }
-    return [@vars,@base];
+
+    my @moose;
+    if ( $baseref && first{ $_->module eq 'Moose' or $_->module eq 'Moo' }@$baseref ) {
+        my @extends = grep{ $_->schild(0)->content eq "extends" }@{ $ppi->find('PPI::Statement') || [] };
+
+        for my $extend ( @extends ) {
+            push @moose, $self->_get_moose_values( $extend );
+        }
+    }
+
+    return [@vars, @base, @moose];
 } # _find_super
+
+sub _get_moose_values{
+    my ($self,$elem) = @_;
+
+    my @parents;
+
+    if ( $elem->find_any('PPI::Statement::Expression') ) {
+        push @parents, $self->_parse_expression( $elem );
+    }
+    elsif ( $elem->find_any('PPI::Token::QuoteLike::Words') ) {
+        push @parents, $self->_parse_quotelike( $elem );
+    }
+    elsif ( $elem->find_any( 'PPI::Structure::List' ) ) {
+        push @parents, $self->_parse_list( $elem );
+    }
+    elsif( $elem->find( \&_any_quotes ) ){
+        push @parents, $self->_parse_quotes( $elem );
+    }
+
+    return @parents;
+}# _get_values
 
 sub _get_include_values{
     my ($self,$baseref) = @_;
     my @parents;
+
     for my $base(@$baseref){
         my @tmp_array;
+
         if( $base->find_any('PPI::Statement::Expression') ){
             push(@parents,$self->_parse_expression( $base ));
         }
@@ -62,9 +98,11 @@ sub _get_include_values{
         elsif( $base->find( \&_any_quotes ) ){
             push @parents,$self->_parse_quotes( $base );
         }
+
         @tmp_array = grep{ $_ ne '-norequire' }@tmp_array if $base->module eq 'parent';
         push @parents, @tmp_array;
     }
+
     return @parents;
 }# _get_base_values
 
@@ -96,15 +134,26 @@ sub _get_isa_values{
     return @parents;
 }# _get_values
 
+sub _parse_list {
+    my ($self, $elem) = @_;
+
+    return $self->_parse_expression( $elem, 'PPI::Structure::List' );
+}
+
 sub _parse_expression{
-    my ($self,$variable) = @_;
-    my $ref = $variable->find('PPI::Statement::Expression');
+    my ($self, $variable, $token_class) = @_;
+
+    $token_class ||= 'PPI::Statement::Expression';
+
+    my $ref = $variable->find( $token_class );
     my @parents;
+
     for my $element($ref->[0]->children()){
         if($element->class =~ /^PPI::Token::Quote::/){
             push( @parents,$element->string );
         }
     }
+
     return @parents;
 }# _parse_expression
 
@@ -142,7 +191,7 @@ sub _parse_quotelike{
 
 =head1 NAME
 
-Class::Superclasses - Find all superclasses of a class
+Class::Superclasses - Find all (direct) superclasses of a class
 
 =head2 DESCRIPTION
 
@@ -182,23 +231,5 @@ scalar context it returns an arrayref.
 tells C<Class::Superclasses> which Perl class should be analyzed.
 
   $parser->document($filename);
-
-=head1 PREREQUESITS
-
-  PPI
-
-=head1 SEE ALSO
-
-L<PPI>, L<Class::Inheritance>
-
-=head1 LICENSE
-
-This program is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself.
-
-=head1 AUTHOR
-
-copyright 2006 - 2007
-Renee Baecker E<lt>module@renee-baecker.deE<gt>
 
 =cut
