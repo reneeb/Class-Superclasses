@@ -1,15 +1,20 @@
 Revision history for Perl extension Class::Superclass.
+======================================================
 
-0.03  Tue Dec 01 16:20:13 2007
+0.06  2013-10-15
+     + switched to Dist::Zilla
+     + added support for Moo(se)?
+
+0.03  2007-12-01
      - various bugfixes
      - added support for parent.pm
      - added support for quoted tokens
      - added more tests
 
-0.02  Sun Jun 18 00:27:32 2006
+0.02  2006-06-18
      - bugfix in POD
 
-0.01  Tue May 16 10:26:06 2006
+0.01  2006-05-16
 	- original version; created by h2xs 1.23 with options
 		-b 5.8.0 -XA -n Class::Superclass
     - methods added:
