@@ -5,7 +5,7 @@ use warnings;
 use List::Util qw(first);
 use PPI;
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 sub new{
     my ($class,$doc) = @_,
