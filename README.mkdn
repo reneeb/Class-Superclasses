@@ -1,0 +1,112 @@
+[![Build Status](https://travis-ci.org/reneeb/Class-Superclasses.svg?branch=master)](https://travis-ci.org/reneeb/Class-Superclasses)
+[![Kwalitee status](http://cpants.cpanauthors.org/dist/Class-Superclasses.png)](http://cpants.charsbar.org/dist/overview/Class-Superclasses)
+[![GitHub issues](https://img.shields.io/github/issues/reneeb/Class-Superclasses.svg)](https://github.com/reneeb/Class-Superclasses/issues)
+
+# NAME
+
+Class::Superclasses
+
+# VERSION
+
+version 0.07
+
+# SYNOPSIS
+
+    use Class::Superclasses;
+    
+    my $class_file = '/path/to/class_file.pm';
+    my $parser = Class::Superclasses->new();
+    $parser->document($class_file);
+    my @superclasses = $parser->superclasses();
+    
+    print $_,"\n" for(@superclasses);
+
+# NAME
+
+Class::Superclasses - Find all (direct) superclasses of a class
+
+## DESCRIPTION
+
+`Class::Superclasses` uses [PPI](https://metacpan.org/pod/PPI) to get the superclasses of a class;
+
+# METHODS
+
+## new
+
+creates a new object of `Class::Superclasses`. 
+
+    my $parser = Class::Superclasses->new();
+    # or
+    my $parser = Class::Superclasses->new($filename);
+
+## superclasses
+
+returns in list context an array of all superclasses of the Perl class, in
+scalar context it returns an arrayref.
+
+    my $arrayref = $parser->superclasses();
+    my @array = $parser->superclasses();
+
+## document
+
+tells `Class::Superclasses` which Perl class should be analyzed.
+
+    $parser->document($filename);
+
+
+
+# Development
+
+The distribution is contained in a Git repository, so simply clone the
+repository
+
+```
+$ git clone http://github.com/reneeb/Class-Superclasses.git
+```
+
+and change into the newly-created directory.
+
+```
+$ cd Class-Superclasses
+```
+
+The project uses [`Dist::Zilla`](https://metacpan.org/pod/Dist::Zilla) to
+build the distribution, hence this will need to be installed before
+continuing:
+
+```
+$ cpanm Dist::Zilla
+```
+
+To install the required prequisite packages, run the following set of
+commands:
+
+```
+$ dzil authordeps --missing | cpanm
+$ dzil listdeps --author --missing | cpanm
+```
+
+The distribution can be tested like so:
+
+```
+$ dzil test
+```
+
+To run the full set of tests (including author and release-process tests),
+add the `--author` and `--release` options:
+
+```
+$ dzil test --author --release
+```
+
+# AUTHOR
+
+Renee Baecker <module@renee-baecker.de>
+
+# COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2015 by Renee Baecker.
+
+This is free software, licensed under:
+
+    The Artistic License 2.0 (GPL Compatible)
