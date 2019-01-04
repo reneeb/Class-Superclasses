@@ -214,6 +214,13 @@ C<Class::Superclasses> uses L<PPI> to get the superclasses of a class;
   
   print $_,"\n" for(@superclasses);
 
+  # or pass a scalar ref that contains the code
+  my $class_code = q~package Test; use base 'Baseclass';~;
+  $parser->document(\$class_code);
+  @superclasses = $parser->superclasses();
+  
+  print $_,"\n" for(@superclasses);
+
 =head1 METHODS
 
 =head2 new
