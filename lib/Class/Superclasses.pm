@@ -1,12 +1,14 @@
 package Class::Superclasses;
 
+# ABSTRACT: Find all (direct) superclasses of a class
+
 use strict;
 use warnings;
 
 use List::Util qw(first);
 use PPI;
 
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
 sub new{
     my ($class,$doc) = @_,
@@ -194,10 +196,6 @@ sub _parse_quotelike{
 1;
 
 =pod
-
-=head1 NAME
-
-Class::Superclasses - Find all (direct) superclasses of a class
 
 =head2 DESCRIPTION
 
