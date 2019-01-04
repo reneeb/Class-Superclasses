@@ -7,6 +7,7 @@ use warnings;
 
 use List::Util qw(first);
 use PPI;
+use Scalar::Util qw(blessed);
 
 our $VERSION = '0.09';
 
@@ -29,10 +30,7 @@ sub superclasses{
 sub document{
     my ($self,$doc) = @_;
 
-    if(defined $doc){
-        $self->{document} = $doc;
-        $self->{super}    = $self->_find_super($doc);
-    }
+    $self->{super} = $self->_find_super($doc) if defined $doc;
 
     return $self;
 }
@@ -40,7 +38,14 @@ sub document{
 sub _find_super{
     my ($self,$doc) = @_;
 
-    my $ppi    = PPI::Document->new($doc) or die $!;
+    my $ppi;
+    if ( blessed $doc && $doc->isa('PPI::Document') ) {
+        $ppi = $doc;
+    }
+    else {
+        $ppi = PPI::Document->new($doc) or die $!;
+    }
+
     my $varref = $ppi->find('PPI::Statement::Variable');
     my @vars   = ();
 
