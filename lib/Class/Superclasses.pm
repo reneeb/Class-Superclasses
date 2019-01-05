@@ -9,7 +9,7 @@ use List::Util qw(first);
 use PPI;
 use Scalar::Util qw(blessed);
 
-our $VERSION = '0.09';
+our $VERSION = '1.00';
 
 sub new{
     my ($class,$doc) = @_,

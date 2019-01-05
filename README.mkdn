@@ -8,7 +8,7 @@ Class::Superclasses - Find all (direct) superclasses of a class
 
 # VERSION
 
-version 0.09
+version 1.00
 
 # SYNOPSIS
 
